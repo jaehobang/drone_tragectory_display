@@ -1,0 +1,10 @@
+frame_id:
+  fixed: world
+  map: world
+  base: delta/base
+  laser: delta/laser
+  imu: delta/imu
+  icp: delta/base_icp
+  localization: delta/base_localization
+  altitude: delta/base_altitude
+  ukf: delta/base_ukf

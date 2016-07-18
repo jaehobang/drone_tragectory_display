@@ -1,0 +1,251 @@
+map:
+  publish_rate: 1
+  resolution: 0.4
+  block_size: 30
+  discard_upward: true
+  free_threshold: 0.13
+  occupancy_threshold: 0.65
+  clamping_min: 0.12
+  clamping_max: 0.97
+  threaded: true
+  track_changes: true
+  initial_count: 15
+  probability_hit: 0.8
+  probability_miss: 0.3
+  use_bbx: false
+  bbx:
+    min:
+      x: -8.0
+      y: -8.0
+      z: -3.0
+    max:
+      x: 8.0
+      y: 8.0
+      z: 3.0
+  occupancy_grid:
+    min_height: -100.0
+    max_height: 100.0
+    floor:
+      width: 0.1
+      delta:
+        upper: 3
+        lower: 4
+
+# yaml setting for distributed_mapping
+distributed_mapping:
+  matcher:
+    pcl:
+      crop_box:
+        x_limit: 40.0
+        y_limit: 40.0
+        z_limit: 3
+      slice:
+        x_limit: 40.0
+        y_limit: 40.0
+        z_limit: 0.5
+      column:
+        x_limit: 15.0
+        y_limit: 15.0
+        z_limit: 3
+      voxel_grid_leaf_size: 0.4        # when adding local scan and searching for keypoints
+      match_grid_leaf_size: 0.4           # Size used when matching two scans
+      normal_radius: 1.5 #0.03
+      iss:
+        support_radius: 3
+        nms_radius: 2
+      keypoint:
+        min_scale: 0.05
+        n_octaves: 3
+        n_scales_per_octave: 4  #3
+        min_contrast: 0.0001
+      feature_radius: 0.08
+      registration:
+        max_iterations: 5000             # number RANSAC iterations
+        feature_align: false
+        feature_max_iterations: 10000
+        n_samples: 3                      # number of points to sample to generate a pose
+        correspondence_rand: 5  #3            # number of nearest features to use
+        sim_threshold: 0.7            #0.9 polygonal edge length similarity threshold
+        max_correspondence_dist: 0.1 #0.1  # 0.0075inlier threshold
+        feature_max_correspondence_dist: 0.5  # 0.0075inlier threshold
+        min_sample_distance: 0.05  # 0.0075inlier threshold
+        inlier_fraction: 0.25            #0.25 required inlier fraction for accepting a pose hypoth
+        convergence_threshold: 0.001            #0.001 convergence threshold for icp
+        error_threshold: 2            #0.8 reject icp matches above this fitness
+        visualize_scan_matching: false # press q to go to the next one
+    tree_nr: 4
+    K: 10
+    flann_radius: 0.25
+    sensor_inverted: false
+    min_cache_size: 5
+    peak_threshold: 0.25
+    feature_on_horizontal_only: true
+    z_range: 1
+
+
+  # icp parameters
+  # this is for consecutive frame matching
+  icp_config_consec:
+    read_randsample_ratio: 0.6
+    read_maxdens_flag: false
+    read_maxdist_flag: false
+    read_maxdist_dist: 15.0
+    outlier_trim_ratio: 0.95
+    outlier_maxdist_flag: false
+    checker_maxiter: 80
+    checker_diff_trans: 0.0005
+    checker_diff_rot: 0.00005
+
+  # Scan Filter
+  scan_filter_setting:
+    voxel_size: 0.1
+
+  # Loop closure detection : feature-based method
+  loop_detect_setting:
+    down_sampling: 1
+
+    # sub-method: feature detection
+    # Mean peak : 2
+    feature_detect_setting:
+      minPeak: 0.2
+      minPeakDistance: 0.0001
+      scale: 4
+      baseSigma: 0.2
+      sigmaStep: 1.0
+      dmst: 2
+      useMaxRange: false
+
+    # sub-method: feature extraction
+    descriptor_setting:
+      minRho: 0.02
+      maxRho: 1.0
+      binRho: 8
+      binPhi: 16
+
+    # sub-method: knn matcher
+    knn_matcher_setting:
+      tree_nr: 4
+      feature_size: 128
+      knn: 30
+
+    # sub-method: find peaks
+    peak_finder_setting:
+      smooth_step: 3
+      smooth_weight: 0.5
+      peak_ratio: 1.0
+      min_peak_thresh_ratio: 1.0
+      flag_accept_all_above: true
+      min_accept_thresh_ratio: 3.0
+
+  # Loop closure matching : feature-based method
+  loop_match_setting:
+    feature_size: 128
+    match_lowe_ratio: 0.7
+    ransac_sigma: 0.25
+    ransac_confidence: 0.8
+    ransac_maxiter: 1000
+    ransac_min_inliers: 4
+
+    # icp matcher module setting
+    icp_config:
+      read_randsample_ratio: 0.4
+      read_maxdens_flag: false
+      read_maxdist_flag: true
+      read_maxdist_dist: 8.0
+      outlier_trim_ratio: 0.8
+      outlier_maxdist_flag: true
+      outlier_maxdist_dist: 1.0
+      checker_maxiter: 40
+      checker_diff_trans: 0.0001
+      checker_diff_rot: 0.00001
+
+  # iSAM2 setting
+  isam_param:
+    relinearizeSkip: 1
+    relinearizeThreshold: 0.001
+
+  # Clustering setting
+  cluster_setting:
+    max_cluster: 5
+    min_nr_candidates: 5
+    cluster_th_xy: 1.0      #2
+    cluster_th_theta: 0.1
+    cluster_res_xy: 1.5     #3
+    cluster_res_theta: 0.25
+
+  # RelativePoseEM setting
+  relativeEM_setting:
+    inlier_prior: 0.5
+    flag_bump_at_zero: false
+    min_inlier_prob: 0.8
+    min_inlier_count: 6
+    flag_reoptimize_inlier_only: false
+    inlier_model_trans: 0.2 # 0.2
+    inlier_model_rot: 0.05  # 0.02
+    outlier_model_trans: 500.0
+    outlier_model_rot: 200.0
+
+  # hypothesis merge setting
+  hypo_merge_setting:
+    position_res: 2.0
+    theta_res: 0.2
+    relative_inlier_ratio: 0.5
+
+  # hypothesis selection setting
+  hypo_select_setting:
+    max_hypothesis_checked: 5
+    prob_ratio_btw_best_second: 2.0
+
+    min_prior_prob: 0.8 # 0.8
+    hprior_use_CRP: true
+    hprior_cell_size: 1.0
+
+    # chinese restaurant setting
+    hprior_CRP_setting:
+      flag_grid: false
+      grid_size: 1.0
+      alpha: 300
+
+    tprior_model_trans: 10.0
+    tprior_model_rot: 1.57
+    measlike_inlier_model_trans: 0.2 #0.2
+    measlike_inlier_model_rot: 0.05  # 0.02
+    measlike_outlier_model_trans: 500.0
+    measlike_outlier_model_rot: 200.0
+
+  # small EM setting
+  smallEM_setting:
+    flag_update_model: false
+    inlier_model_trans: 0.4
+    inlier_model_rot: 0.04
+    outlier_model_trans: 500.0
+    outlier_model_rot: 200.0
+    inlier_prior: 0.5
+    min_inlier_prob: 0.8
+
+  # some ther global parameter used
+
+  # find loop closure interval
+  find_loop_min_localcache: 5
+  find_loop_min_inter: 5
+  min_pose_count: 10
+  find_loop_min_distance: 0.2
+
+  # consecutive setting
+  use_icp_odometry: false
+  icp_default_model_trans: 0.05  # 0.01
+  icp_default_model_rot: 0.005   #0.001
+
+  # local loop closure setting
+  local_loop_count_smallEM: 10
+  local_loop_interval: 500
+  loop_default_model_trans: 0.05
+  loop_default_model_rot: 0.005
+
+  # remote agent setting, exclude itself!!
+  agent_count: 1
+
+  # other settings, such as output setting
+  flag_output: false
+
+

@@ -1,0 +1,44 @@
+
+rate:
+  ctrl: 200.0
+
+pos_epsilon: 0.1
+yaw_epsilon: 0.1
+
+lookahead_time: 0.005
+
+mpc:
+  dt:   0.005
+  constraints:
+    states:
+      xdot:       2
+      ydot:       2
+      zdot:       2
+      phi:        0.5
+      theta:      0.5
+    inputs:
+      F:
+        min:    0.2 #g
+        max:    1.9 #g
+      Mphi:     2
+      Mtheta:   2
+      Mpsi:     2
+  cost:
+    Q:
+      x:        50000
+      y:        50000
+      z:        50000
+      xdot:     100
+      ydot:     100
+      zdot:     150
+      phi:      10
+      theta:    10
+      psi:      1.0
+      p:        0.01
+      q:        0.01
+      r:        0.01
+    R:
+      F:        1.1
+      Mphi:     5.5
+      Mtheta:   5.5
+      Mpsi:     1.5

@@ -1,0 +1,10 @@
+frame_id:
+  fixed: world
+  map: world
+  base: india/base
+  laser: india/laser
+  imu: india/imu
+  icp: india/base_icp
+  localization: india/base_localization
+  altitude: india/base_altitude
+  ukf: india/base_ukf

@@ -1,0 +1,15 @@
+
+rate:
+  pos_ctrl: 100.0
+
+path:
+  pos_lookahead: 0.1
+  yaw_lookahead: 0.1
+
+spline:
+  lookahead_time: 0.01
+
+gains:
+  pos: {x: 9.0, y: 9.0, z: 13}
+  vel: {x: 4.4, y: 4.4, z: 6.0}
+

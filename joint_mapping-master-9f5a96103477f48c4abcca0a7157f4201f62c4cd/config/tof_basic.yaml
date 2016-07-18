@@ -1,0 +1,38 @@
+tof_camera:
+  fov:
+    x: 30 # 43.60
+    y: 140  # 34.60
+  size:
+    x: 12 # 38
+    y: 240 # 24
+  range_min: 0.023
+  range_max: 14.0
+  offset:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 1.5707
+    yaw: 0.0
+trimmed_tof:
+  fov_x: 43.60
+  fov_y: 34.60
+  width: 38
+  height: 24
+  range_min: 0.023
+  range_max: 4.9
+  p00: 0.0
+  p10: 0.0
+  p01: 0.0
+  p20: 0.0
+  p11: 0.0
+  p02: 0.0
+  resolution: 0.25
+tof:
+  offset:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    roll: 0.0
+    pitch: 1.5707
+    yaw: 0.0

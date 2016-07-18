@@ -1,0 +1,166 @@
+<launch>
+  <arg name="vehicle1" default="danaus05"/>
+  <arg name="vehicle3" default="danaus08"/>
+  <arg name="mapname" default="my_tunnel_4_noceil"/>
+
+  <rosparam param="robot_list">[danaus05,danaus08]</rosparam>
+  <rosparam param="robot_id_list">[a,b]</rosparam>
+
+  <node name="tof_camera_simulator" pkg="tof_camera_simulator" type="tof_camera_simulator" launch-prefix="xterm -e gdb --args">
+      <rosparam file="$(find joint_mapping)/config/tof_basic.yaml" command="load" />
+      <param name="rate" value="1000" type="int" />
+      <param name="frame_id/fixed" value = "world" />
+      <param name="frame_id/base" value = "base" />
+      <param name="frame_id/tof" value = "tof_frame" />
+      <param name="/map/filename" value="$(find joint_mapping)/maps/$(arg mapname).pcd" type="str" />
+      <param name="/map/resolution" value="0.1"/>
+      <param name="count" value="2"/>
+
+      <param name="name/robot1" value="$(arg vehicle1)"/>
+      <param name="name/robot2" value="$(arg vehicle3)"/>
+  </node>
+
+  <!--
+  <node pkg="rosbag"
+    type="record"
+    name="record"
+    output="screen"
+    args="-O $(find joint_mapping)/data/simulation_9.bag
+    /tf
+    /distributed_mapping_uav10/knn_hist
+    /distributed_mapping_uav10/packet_size_count
+    /distributed_mapping_uav10/relpose_estimate
+    /distributed_mapping_uav10/scan_points_count
+    /distributed_mapping_uav10/match_scan_info
+    /distributed_mapping_uav10/timer
+    /distributed_mapping_uav11/knn_hist
+    /distributed_mapping_uav11/packet_size_count
+    /distributed_mapping_uav11/relpose_estimate
+    /distributed_mapping_uav11/scan_points_count
+    /distributed_mapping_uav11/match_scan_info
+    /distributed_mapping_uav11/timer
+    /cpu_monitor/cpu_status
+    "/>
+
+  <node name="cpu_monitor"
+    pkg="cpu_monitor"
+    type="cpu_monitor"
+    output="screen">
+    <param name="time_constant" value="0.1" />
+    <param name="rate" value="10" />
+  </node>
+    -->
+
+  <node name="scan_odom_sync_1"
+    pkg="scan_odom_sync"
+    type="scan_odom_sync"
+    output="screen">
+
+    <param name="update_interval" value="5" />
+    <param name="robot_name" value="$(arg vehicle1)"/>
+    <param name="robot_frame" value="$(arg vehicle1)/base" />
+
+    <remap from="~/$(arg vehicle1)/point_cloud_with_pose" to="/$(arg vehicle1)/point_cloud_with_pose"/>
+  </node>
+
+  <node name="scan_odom_sync_2"
+    pkg="scan_odom_sync"
+    type="scan_odom_sync"
+    output="screen">
+
+    <param name="update_interval" value="5" />
+    <param name="robot_name" value="$(arg vehicle3)"/>
+    <param name="robot_frame" value="$(arg vehicle3)/base" />
+
+    <remap from="~/$(arg vehicle3)/point_cloud_with_pose" to="/$(arg vehicle3)/point_cloud_with_pose"/>
+  </node>
+
+
+<!--========================= distributed_mapping nodes ========================-->
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle1)"
+    type="joint_mapping_node"
+    output="screen"
+    launch-prefix="xterm -e gdb --args"
+    >
+    <!-- setting: default distributed_mapping param and agent name -->
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <!--
+    <param name="name/robot" value="$(arg vehicle1)"/>
+    <param name="name/robotID" value="a"/>
+    -->
+    <!-- Index into the robot list -->
+    <param name="index" value="0"/>
+    <param name="update_interval" value="5"/>
+
+    <!-- udp lists : localhost:50000 -->
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50000"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50001"/>
+
+    <param name="range_max" value="15"/>
+
+    <param name="robot_frame" value="$(arg vehicle1)/base"/>
+
+    <param name="frame_id/fixed" value="world"/>
+    <param name="frame_id/dma" value="dma" />
+
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+
+
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle3)"
+    type="joint_mapping_node"
+    output="screen"
+    >
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <param name="index" value="1"/>
+    <param name="update_interval" value="5"/>
+
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50002"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50000"/>
+
+    <param name="range_max" value="15"/>
+
+    <param name="robot_frame" value="$(arg vehicle3)/base"/>
+
+    <param name="frame_id/fixed" value="world"/>
+    <param name="frame_id/dma" value="dma" />
+
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+
+  <!--=============================================================-->
+  <!--=============================MESHES===========================-->
+  <!--=============================================================-->
+
+  <!--
+  <node  pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+    <param name="resolution" value="0.05" />
+
+    <param name="frame_id" type="string" value="world" />
+    <param name="sensor_model/max_range" value="100.0" />
+
+    <param name="filter_ground" value="true" />
+    <param name="base_frame_id" value="world"/>
+
+    <remap from="cloud_in" to="/distributed_mapping_$(arg vehicle1)/map_points" />
+  </node>
+  -->
+
+  <node pkg="pcl_ros"
+    type="pcd_to_pointcloud"
+    name="pcd_to_pointcloud"
+    output="screen"
+    args="$(find joint_mapping)/maps/my_tunnel_4_noceil.pcd">
+    <param name="frame_id" value="/world"/>
+  </node>
+
+</launch>
+

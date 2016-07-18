@@ -1,0 +1,140 @@
+<launch>
+  <param name="use_sim_time" value="true"/>
+  <arg name="vehicle" default="uav2"/>
+  <arg name="mapname" default="my_tunnel_4_noceil"/>
+
+  <!-- Vehicle Parameters -->
+  <rosparam file="$(find joint_mapping)/config/CMUQuad10-DELTA.yaml"/>
+
+  <!-- Laser Parameters -->
+  <rosparam file="$(find joint_mapping)/config/UTM30LX-DELTA.yaml"/>
+
+  <node pkg="rosbag"
+    type="record"
+    name="record"
+    output="screen"
+    args="-O $(find joint_mapping)/data/$(arg vehicle)_tof.bag
+    /$(arg vehicle)/velodyne_points
+    /tf
+    "/>
+
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        output="screen"
+        args="-d $(find joint_mapping)/rviz/simulate.rviz"/>
+
+  <node pkg="quadrotor_simulator"
+        name="simulator"
+        type="quadrotor_simulator"
+        output="screen">
+    <param name="rate/sim" value="500"/>
+    <param name="rate/odom" value="100"/>
+    <param name="rate/imu" value="200"/>
+    <param name="rate/mag" value="100"/>
+    <param name="rate/cmd" value="200"/>
+    <param name="rate/baro" value="100"/>
+    <param name="rate/clock" value="1000"/>
+
+    <param name="count" value="1"/>
+    <param name="name/robot1" value="$(arg vehicle)"/>
+
+    <param name="frame_id/fixed" value="/world"/>
+    <param name="frame_id/base" value="/base"/>
+    <param name="frame_id/imu" value="/imu"/>
+
+    <param name="$(arg vehicle)/init/x" value="29"/>
+    <param name="$(arg vehicle)/init/y" value="5"/>
+    <param name="$(arg vehicle)/init/z" value="0.09"/>
+
+    <rosparam file="$(find joint_mapping)/config/CMUQuad10-DELTA.yaml"/>
+    <rosparam file="$(find joint_mapping)/config/delta_frames.yaml"/>
+    <param name="name/robot1" value="$(arg vehicle)"/>
+    <param name="input" value="pd"/>
+  </node>
+
+
+  <node name="tof_camera_simulator" pkg="tof_camera_simulator" type="tof_camera_simulator">
+      <rosparam file="$(find joint_mapping)/config/tof_basic.yaml" command="load" />
+      <param name="rate" value="1000" type="int" />
+      <param name="frame_id/fixed" value = "world" />
+      <param name="frame_id/base" value = "base" />
+      <param name="frame_id/tof" value = "tof_frame" />
+      <param name="/map/filename" value="$(find joint_mapping)/maps/$(arg mapname).pcd" type="str" />
+      <param name="/map/resolution" value="0.1"/>
+      <param name="count" value="1"/>
+
+      <param name="name/robot1" value="$(arg vehicle)"/>
+  </node>
+
+
+  <node pkg="pcl_ros"
+    type="pcd_to_pointcloud"
+    name="pcd_to_pointcloud"
+    output="screen"
+    args="$(find joint_mapping)/maps/$(arg mapname).pcd">
+    <param name="frame_id" value="world"/>
+  </node>
+
+  <!--=============================================================-->
+  <!--==========================Vechicle 1=========================-->
+  <!--=============================================================-->
+  <group ns="$(arg vehicle)">
+
+    <include file="$(find cmu_quadrotor_mesh)/launch/CMUQuad10-MAST.launch">
+      <arg name="name" value="quad_red"/>
+      <arg name="color" value="red"/>
+    </include>
+    <rosparam file="$(find joint_mapping)/config/delta_frames.yaml"/>
+
+    <node pkg="motion_manager"
+          name="motion_manager"
+          type="motion_manager"
+          output="screen">
+      <param name="frame_id/fixed" value="/world"/>
+      <param name="frame_id/base" value="$(arg vehicle)/base"/>
+
+      <!-- Load General Parameters -->
+      <rosparam file="$(find new_control_arch_example)/config/CMUQuad10-DELTA.yaml"/>
+      <param name="takeoff_height" value="1.0"/>
+      <param name="arrival_thresh/pos" value="0.05"/>
+      <param name="arrival_thresh/yaw" value="0.05"/>
+
+      <!-- Define Trajectory Generator -->
+      <param name="TrajectoryGenerator" value="Line"/>
+      <param name="TrajectoryGeneratorSimple" value="Line"/>
+      <rosparam file="$(find new_control_arch_example)/config/TrajGen_Line.yaml"/>
+      <param name="traj_type" value="Path"/>
+
+      <!-- Define Controller -->
+      <param name="Controller" value="QuadrotorBackstepping"/>
+      <param name="QuadrotorPositionController" value="PD"/>
+      <rosparam file="$(find new_control_arch_example)/config/CMUQuad6_Control_PositionPD.yaml"/>
+      <param name="QuadrotorAttitudeController" value="PD"/>
+      <rosparam file="$(find new_control_arch_example)/config/CMUQuad6_Control_AttitudePD.yaml"/>
+
+      <remap from="~odom" to="odom"/>
+      <remap from="~goal_pos" to="goal_pos"/>
+      <remap from="~imu" to="imu"/>
+      <remap from="~rpm_cmd" to="rpm_cmd"/>
+    </node>
+
+    <node pkg="simple_ui"
+          name="simple_ui"
+          type="simple_ui"
+          output="screen">
+      <param name="frame_id/fixed" value="/world"/>
+      <param name="frame_id/base" value="$(arg vehicle)/base"/>
+
+      <param name="rate/keyboard" value="10"/>
+    </node>
+
+    <node pkg="quadrotor_planner_ui"
+          name="planner_ui"
+          type="quadrotor_planner_ui"
+          output="screen">
+      <param name="frame_id/fixed" value="/world"/>
+    </node>
+  </group>
+
+</launch>

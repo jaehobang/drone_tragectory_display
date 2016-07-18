@@ -1,0 +1,7 @@
+
+gains:
+  rot: {x: 250, y: 250, z: 60}
+  ang: {x: 50, y: 50, z: 15.4}
+
+rate:
+  att_ctrl: 250.0

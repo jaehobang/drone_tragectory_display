@@ -1,0 +1,121 @@
+<launch>
+  <arg name="vehicle1" default="hotel"/>
+  <arg name="vehicle3" default="india"/>
+
+  <arg name="bagfile" default="robot_cloud"/>
+
+  <node pkg="rosbag"
+    name="rosbag_hotel"
+    type="play"
+    args="$(find joint_mapping)/data/hotel6.bag">
+  </node>
+
+  <node pkg="rosbag"
+    name="rosbag_india"
+    type="play"
+    args="$(find joint_mapping)/data/india5.bag">
+  </node>
+
+  <!-- Vehicle Parameters -->
+  <rosparam file="$(find joint_mapping)/config/CMUQuad10-DELTA.yaml"/>
+
+  <!-- Laser Parameters -->
+  <rosparam file="$(find joint_mapping)/config/UTM30LX-DELTA.yaml"/>
+
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        output="screen"
+        args="-d $(find joint_mapping)/rviz/three_robot_run_bag.rviz"/>
+
+  <node name="scan_merge"
+        pkg="scan_merge"
+        type="scan_merge"
+        output="screen">
+
+    <remap from="~odom_tagged" to="/odom_tagged"/>
+    <remap from="~scan_tagged" to="/scan_tagged"/>
+    <param name="translate/x" value="-14"/>
+    <param name="translate/y" value="-2"/>
+    <param name="rotate/yaw" value="0"/>
+
+    <param name="disp_rate" value="10"/>
+    <param name="map/path" value="$(find distributed_mapping)/maps/tunnel_mod_v3.png" />
+
+    <param name="num_robots" value="2"/>
+    <param name="robot/0" value="hotel"/>
+    <param name="robot/1" value="india"/>
+  </node>
+
+  <rosparam param="robot_list">[hotel,india]</rosparam>
+  <rosparam param="robot_id_list">[a,b]</rosparam>
+
+<!--========================= distributed_mapping nodes ========================-->
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle1)"
+    type="joint_mapping_node"
+    output="screen">  
+    <!-- setting: default distributed_mapping param and agent name -->
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <!--
+    <param name="name/robot" value="$(arg vehicle1)"/>
+    <param name="name/robotID" value="a"/>
+    -->
+    <!-- Index into the robot list -->
+    <param name="index" value="0"/>
+    <param name="update_interval" value="5"/>
+    
+    <!-- udp lists : localhost:50000 -->
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50000"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50001"/>
+
+    <remap from="~scan_tagged" to="/scan_tagged"/>
+    <remap from="~odom_tagged" to="/odom_tagged"/>
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle3)"
+    type="joint_mapping_node"
+    output="screen">  
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <param name="index" value="1"/>
+    <param name="update_interval" value="5"/>
+    
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50001"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50000"/>
+
+    <remap from="~scan_tagged" to="/scan_tagged"/>
+    <remap from="~odom_tagged" to="/odom_tagged"/>
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+  
+  <!--=============================================================-->
+  <!--=============================DELTA===========================-->
+  <!--=============================================================-->
+  <group ns="$(arg vehicle1)">
+    <include file="$(find cmu_quadrotor_mesh)/launch/CMUQuad10-MAST.launch">
+      <arg name="name" value="quad_blue"/>
+      <arg name="color" value="red"/>
+    </include>
+    <rosparam file="$(find joint_mapping)/config/hotel_frames.yaml"/>
+  </group>
+
+  <!--=============================================================-->
+  <!--=============================HOTEL===========================-->
+  <!--=============================================================-->
+  <group ns="$(arg vehicle3)">
+
+    <include file="$(find cmu_quadrotor_mesh)/launch/CMUQuad10-MAST.launch">
+      <arg name="name" value="quad_red"/>
+      <arg name="color" value="blue"/>
+    </include>
+    <rosparam file="$(find joint_mapping)/config/india_frames.yaml"/>
+  </group>
+</launch>

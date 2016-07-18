@@ -1,0 +1,6 @@
+frame_id:
+  fixed: world
+  map: world
+  base: base_sim
+  laser: laser_sim
+  imu: imu_sim

@@ -1,0 +1,53 @@
+
+gains:
+  pos: {x: 1.8, y: 1.8, z: 3.0990}
+  vel: {x: 2.0, y: 2.0, z: 3.9572}
+
+rate:
+  pos_ctrl: 100.0
+
+pos_epsilon: 0.1
+yaw_epsilon: 0.1
+
+lookahead_time: 0.01
+
+
+#az_trim: 0.6
+#vmin: 0.05
+#vmax: 0.3
+#amax: 2.0
+#wmax: 0.3490658503988659
+#limits:
+  #phi: 0.5 #0.95
+  #theta: 0.5 #0.95
+  #psi: 0.436
+#epsilon:
+  #heading: 0.087 #6.28
+  #regulator: 0.02
+#heights:
+  #takeoff: 1.0
+  #ground_effect: 0.3
+#takeoff:
+  #speed: 0.2
+  #ramp_time: 0.2
+#land:
+  #speed: 0.2
+  #error_tolerance:
+    #xy: 0.1
+    #z: 0.05
+#carrot_lookahead_time: 0.01
+#voltage:
+  #warn: 10.8
+  #land: 10.7
+  #critical: 10.5
+#rc_channel:
+  #thrust: 2
+  #roll: 0
+  #pitch: 1
+  #yaw: 3
+  #mode: 4
+  #auton: 6
+#motor_toggle:
+  #count: 2
+  #thrust_threshold: 0.05
+  #yaw_threshold: 0.95

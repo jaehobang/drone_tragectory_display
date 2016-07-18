@@ -1,0 +1,25 @@
+mass: 1.855
+gravity: 9.81
+zoffset: 0.149
+inertia:
+  Ixx: 0.0210468
+  Iyy: 0.021109
+  Izz: 0.0240574
+  Ixy: -0.000106389
+  Ixz: 4.85029e-6
+  Iyz: 0.0000195723
+length: 0.20473
+gains:
+  motor: 18
+  thrust: 1.3429e-07
+  moment_scale: 0.0157
+pwm: # Based on default values in ESC32
+  low: 1000
+  high: 1950
+  rpm_scale: 8000
+rpm:
+  min: 1200
+  max: 8000
+battery:
+  voltage: {V0: 12.6, V1: 11.8, V2: 10.2, V3: 7.0}
+  time: {t1: 75, t2: 900, t3: 1000}

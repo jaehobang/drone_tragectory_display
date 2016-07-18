@@ -1,0 +1,26 @@
+mass: 0.507 # mass of 6-inch quad with 1350 mAh battery
+gravity: 9.81
+zoffset: 0.09 # hand-measured from PX4 to bottom of charging feet
+# for 5-inch quad, TODO: replace with 6-inch quad values
+inertia:
+  Ixx: 0.00082337384163612
+  Iyy: 0.00084270614748756
+  Izz: 0.0011117226584857
+  Ixy: 0.000017382085016406
+  Ixz: -0.00000070568707636496
+  Iyz: -0.00000149981396746284
+length: 0.118745 # for 6-inch prop arms
+gains:
+  motor: 36.5 # 6 x 4 prop on Multistar Elite 2204-2300kv
+  thrust: 1.270e-08
+  moment_scale: 0.017
+pwm:
+  low: 1000
+  high: 1950
+  rpm_scale: 16500
+rpm:
+  min: 1200
+  max: 16500
+battery:
+  voltage: {V0: 12.6, V1: 11.8, V2: 10.2, V3: 7.0}
+  time: {t1: 75, t2: 900, t3: 1000}

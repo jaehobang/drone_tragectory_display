@@ -1,0 +1,7 @@
+string local_robot
+string foreign_robot
+uint16 local_pose_count
+uint16 foreign_pose_count
+sensor_msgs/PointCloud2 local_pc
+sensor_msgs/PointCloud2 foreign_pc
+geometry_msgs/Pose2D rel_pose

@@ -1,0 +1,245 @@
+<launch>
+  <arg name="vehicle1" default="uav10"/>
+  <arg name="vehicle2" default="uav12"/>
+  <arg name="vehicle3" default="uav11"/>
+  <arg name="rate" default="1"/>
+  <rosparam param="robot_list">[uav10,uav12,uav11]</rosparam>
+  <rosparam param="robot_id_list">[a,c,b]</rosparam>
+
+  <arg name="bagfile" default="robot_cloud"/>
+
+  <node pkg="rosbag"
+    name="rosbag_simulation_$(arg vehicle1)"
+    type="play"
+    args="-r $(arg rate) -s 10 /home/vibhav/bagfiles/$(arg vehicle1)_simple.bag">
+  </node>
+
+  <!--
+  <node pkg="rosbag"
+    name="rosbag_simulation_$(arg vehicle2)"
+    type="play"
+    args="-r $(arg rate) $(find joint_mapping)/data/$(arg vehicle2)_tof.bag">
+  </node>
+  -->
+
+<!--
+  <node pkg="rosbag"
+    name="rosbag_simulation_$(arg vehicle3)"
+    type="play"
+    args="-r $(arg rate) -s 10 /home/vibhav/bagfiles/$(arg vehicle3)_simple.bag">
+  </node>
+  -->
+  <!--args="/home/vibhav/bagfiles/simulated_data/simulation.bag"> -->
+
+
+  <!-- Record important packages for replay or matlab analysis -->
+  <node pkg="rosbag"
+    type="record"
+    name="record"
+    output="screen"
+    args="-O $(find joint_mapping)/data/simulation_9.bag
+    /tf
+    /distributed_mapping_$(arg vehicle1)/knn_hist
+    /distributed_mapping_$(arg vehicle1)/packet_size_count
+    /distributed_mapping_$(arg vehicle1)/relpose_estimate
+    /distributed_mapping_$(arg vehicle1)/scan_points_count
+    /distributed_mapping_$(arg vehicle1)/match_scan_info
+    /distributed_mapping_$(arg vehicle1)/timer
+    /distributed_mapping_$(arg vehicle2)/knn_hist
+    /distributed_mapping_$(arg vehicle2)/packet_size_count
+    /distributed_mapping_$(arg vehicle2)/relpose_estimate
+    /distributed_mapping_$(arg vehicle2)/scan_points_count
+    /distributed_mapping_$(arg vehicle2)/match_scan_info
+    /distributed_mapping_$(arg vehicle2)/timer
+    /distributed_mapping_$(arg vehicle3)/knn_hist
+    /distributed_mapping_$(arg vehicle3)/packet_size_count
+    /distributed_mapping_$(arg vehicle3)/relpose_estimate
+    /distributed_mapping_$(arg vehicle3)/scan_points_count
+    /distributed_mapping_$(arg vehicle3)/match_scan_info
+    /distributed_mapping_$(arg vehicle3)/timer
+    /cpu_monitor/cpu_status
+    "/>
+
+
+
+  <rosparam file="$(find joint_mapping)/config/UTM30LX-DELTA.yaml"/>
+
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        output="screen"
+        args="-d /home/vibhav/bagfiles/simulated_data/simulation_visualization.rviz"/>
+
+  <node name="cpu_monitor"
+    pkg="cpu_monitor"
+    type="cpu_monitor"
+    output="screen">
+    <param name="time_constant" value="0.1" />
+    <param name="rate" value="10" />
+  </node>
+
+  <node name="scan_odom_sync_1"
+    pkg="scan_odom_sync"
+    type="scan_odom_sync"
+    output="screen">
+
+    <param name="update_interval" value="5" />
+    <param name="robot_name" value="$(arg vehicle1)"/>
+    <param name="robot_frame" value="$(arg vehicle1)/base" />
+    <param name="world_frame" value="sensor_init" />
+
+    <remap from="~/$(arg vehicle1)/point_cloud_with_pose" to="/$(arg vehicle1)/point_cloud_with_pose"/>
+  </node>
+
+  <!--
+  <node name="scan_odom_sync_2"
+    pkg="scan_odom_sync"
+    type="scan_odom_sync"
+    output="screen">
+
+    <param name="update_interval" value="5" />
+    <param name="robot_name" value="$(arg vehicle2)"/>
+    <param name="robot_frame" value="$(arg vehicle2)/base" />
+    <param name="world_frame" value="sensor_init" />
+
+    <remap from="~/$(arg vehicle2)/point_cloud_with_pose" to="/$(arg vehicle2)/point_cloud_with_pose"/>
+  </node>
+  -->
+
+  <node name="scan_odom_sync_3"
+    pkg="scan_odom_sync"
+    type="scan_odom_sync"
+    output="screen">
+
+    <param name="update_interval" value="5" />
+    <param name="robot_name" value="$(arg vehicle3)"/>
+    <param name="robot_frame" value="$(arg vehicle3)/base" />
+    <param name="world_frame" value="sensor_init" />
+
+    <remap from="~/$(arg vehicle3)/point_cloud_with_pose" to="/$(arg vehicle3)/point_cloud_with_pose"/>
+  </node>
+
+  <param name="use_udp" value="false"/>
+
+
+<!--========================= distributed_mapping nodes ========================-->
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle1)"
+    type="joint_mapping_node"
+    output="screen">
+    <!-- setting: default distributed_mapping param and agent name -->
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <!--
+    <param name="name/robot" value="$(arg vehicle1)"/>
+    <param name="name/robotID" value="a"/>
+    -->
+    <!-- Index into the robot list -->
+    <param name="index" value="0"/>
+    <param name="update_interval" value="5"/>
+
+    <!-- udp lists : localhost:50000 -->
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50000"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50001"/>
+    <param name="udp/foreign_agent_ip2" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port2" value="50002"/>
+
+    <param name="use_udp" value="false"/>
+
+    <param name="range_max" value="15"/>
+
+    <param name="robot_frame" value="$(arg vehicle1)/base"/>
+
+    <param name="frame_id/fixed" value="world"/>
+    <param name="frame_id/dma" value="dma" />
+    <param name="frame_id/map" value="world" />
+
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+
+  <!--
+  <node  pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+    <param name="resolution" value="0.05" />
+
+    <param name="frame_id" type="string" value="world" />
+    <param name="sensor_model/max_range" value="100.0" />
+
+    <param name="filter_ground" value="true" />
+    <param name="base_frame_id" value="world"/>
+
+    <remap from="cloud_in" to="/distributed_mapping_$(arg vehicle1)/map_points" />
+  </node>
+  -->
+
+<!--
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle2)"
+    type="joint_mapping_node"
+    output="screen">
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <param name="index" value="1"/>
+    <param name="update_interval" value="5"/>
+
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50001"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50000"/>
+    <param name="udp/foreign_agent_ip2" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port2" value="50002"/>
+
+    <param name="range_max" value="15"/>
+
+    <param name="robot_frame" value="$(arg vehicle2)/base"/>
+
+    <param name="frame_id/fixed" value="world"/>
+    <param name="frame_id/dma" value="dma" />
+
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+  -->
+
+  <node pkg="joint_mapping"
+    name="distributed_mapping_$(arg vehicle3)"
+    type="joint_mapping_node"
+    output="screen">
+    <rosparam file="$(find joint_mapping)/config/parameters.yaml"/>
+
+    <param name="index" value="2"/>
+    <param name="update_interval" value="5"/>
+
+    <param name="udp/local_ip" value="127.0.0.1"/>
+    <param name="udp/local_port" value="50002"/>
+    <param name="udp/foreign_agent_ip1" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port1" value="50000"/>
+    <param name="udp/foreign_agent_ip2" value="127.0.0.1"/>
+    <param name="udp/foreign_agent_port2" value="50001"/>
+    <param name="use_udp" value="false"/>
+
+    <param name="range_max" value="15"/>
+
+    <param name="robot_frame" value="$(arg vehicle3)/base"/>
+
+    <param name="frame_id/fixed" value="world"/>
+    <param name="frame_id/dma" value="dma" />
+    <param name="frame_id/map" value="world" />
+
+    <remap from="~agentPackage" to="/agentPackage"/>
+  </node>
+
+  <!--=============================================================-->
+  <!--=============================MESHES===========================-->
+  <!--=============================================================-->
+
+  <node pkg="pcl_ros"
+    type="pcd_to_pointcloud"
+    name="pcd_to_pointcloud"
+    output="screen"
+    args="$(find joint_mapping)/maps/my_tunnel_4_noceil.pcd">
+    <param name="frame_id" value="/world"/>
+  </node>
+
+</launch>
+

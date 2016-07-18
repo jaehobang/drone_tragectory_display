@@ -1,0 +1,51 @@
+laser:
+noise:
+hit: 0.01
+scan_time: 0.1
+range_min: 0.023
+range_max: 30.0
+angle_min: -2.35619449
+angle_max: 2.35619449
+angle_increment: 0.00436332309619
+time_increment: 1.73611115315e-05
+offset:
+x: 0.0
+y: 0.0
+z: 0.087
+roll: 0.0
+pitch: 0.0
+yaw: -0.78539816339
+
+trimmed_laser:
+mirror_distance: 0.082
+angle_min: -1.53588974175501
+angle_max: 1.53588974175501
+range_min: 0.082
+range_max: 28.0
+enable_no_return: false
+footprint:
+lx: 0.31
+ly: 0.31
+downward:
+mirror_offset:
+x: -0.01426
+y: 0.0877
+scan_index: 910
+scan_count: 52
+range_min: 0.082
+range_max: 10.0
+upward:
+mirror_offset:
+x: -0.0149
+y: -0.08468
+scan_index: 124
+scan_count: 14
+range_min: 0.086
+range_max: 10.0
+offset:
+x: 0.0
+y: 0.0
+z: 0.087
+roll: 0.0
+pitch: 0.0
+yaw: -0.78539816339

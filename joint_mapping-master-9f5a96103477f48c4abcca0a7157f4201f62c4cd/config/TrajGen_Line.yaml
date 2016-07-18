@@ -1,0 +1,21 @@
+
+line_traj:
+  path:
+    waypoint_pos_step: 0.01
+    waypoint_yaw_step: 0.01
+  spline:
+    enable_path_converter: true
+    enable_path_decomposer: true
+    enable_auto_yaw: false
+    order: 9
+    derivative_to_minimize: 4
+    sample_dt: 0.1
+    vel_nom:
+      pos: 0.5
+      yaw: 0.5
+    segment_time: 2.5
+    displacement_thresh: 0.1
+    elev_angle_thresh: 0.2
+    yaw_thresh: 0.3
+  visualization:
+    thickness: 0.03

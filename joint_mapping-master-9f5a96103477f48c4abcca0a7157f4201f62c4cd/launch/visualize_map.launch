@@ -1,0 +1,18 @@
+
+<launch>
+  <node name="rviz"
+        pkg="rviz"
+        type="rviz"
+        output="screen"
+        args="-d $(find joint_mapping)/rviz/visualize_map.rviz"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 1 link1_parent link1 100" />
+
+  <node pkg="pcl_ros"
+    type="pcd_to_pointcloud"
+    name="pcd_to_pointcloud"
+    output="screen"
+    args="$(find joint_mapping)/maps/my_tunnel.pcd">
+    <param name="frame_id" value="/world"/>
+  </node>
+</launch>

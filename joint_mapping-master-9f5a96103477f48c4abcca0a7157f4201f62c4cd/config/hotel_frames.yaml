@@ -1,0 +1,10 @@
+frame_id:
+  fixed: world
+  map: world
+  base: hotel/base
+  laser: hotel/laser
+  imu: hotel/imu
+  icp: hotel/base_icp
+  localization: hotel/base_localization
+  altitude: hotel/base_altitude
+  ukf: hotel/base_ukf

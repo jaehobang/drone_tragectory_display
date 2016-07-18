@@ -1,0 +1,37 @@
+planner:
+  replan_rate: 1.0
+  timeout: 0.2
+  base_radius: 0.45
+  range: 0.5
+  max_retries: 10
+  displacement_thresh: 0.1
+  yaw_offset: -0.78539816339
+  visualization:
+    thickness: 0.03
+  spline:
+    enable_path_converter: true
+    enable_path_decomposer: true
+    order: 9
+    sample_dt: 0.1
+    vel_nom:
+      pos: 0.15
+      yaw: 0.15
+    segment_time: 2.5
+    elev_angle_thresh: 0.2
+    yaw_thresh: 0.3
+
+map:
+  zmax_threshold: 1.7
+  zmin_threshold: 0.3
+  enable_z_bounds: true
+  resolution: 0.1
+  free_threshold: 0.13
+  occupancy_threshold: 0.7
+  clamping_min: 0.1192
+  clamping_max: 0.971
+  probability_hit: 0.7
+  probability_miss: 0.4
+  initial_count: 10
+  threaded: true
+  block_size: 30
+  track_changes: true
